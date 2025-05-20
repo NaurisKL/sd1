@@ -12,16 +12,20 @@ return [
     'location' => 'Vieta',
     'description' => 'Aprašymas',
     'participants' => 'Dalyviai',
+    'lecturers' => 'Lektoriai',
     'status' => [
+        'title' => 'Būsena',
         'upcoming' => 'Planuojama',
         'past' => 'Įvykusi',
     ],
     'actions' => [
+        'title' => 'Veiksmai',
         'create' => 'Sukurti konferenciją',
         'edit' => 'Redaguoti',
         'delete' => 'Šalinti',
         'update' => 'Atnaujinti',
         'back' => 'Grįžti',
+        'confirm_delete' => 'Ar tikrai norite ištrinti šią konferenciją?',
     ],
     'messages' => [
         'created' => 'Konferencija sėkmingai sukurta',

@@ -14,6 +14,7 @@ return [
         'admin' => 'Administratorius',
     ],
     'actions' => [
+        'title' => 'Veiksmai',
         'edit' => 'Redaguoti',
         'update' => 'Atnaujinti',
         'back' => 'Grįžti',
