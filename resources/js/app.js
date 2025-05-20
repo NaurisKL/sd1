@@ -1,5 +1,7 @@
 import './bootstrap';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
+
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Swal from 'sweetalert2';
@@ -11,7 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
         flatpickr(input, {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            time_24hr: true
+            time_24hr: true,
+            locale: "lt"
         });
     });
 });
