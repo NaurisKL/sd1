@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -12,8 +15,49 @@ class UserController extends Controller
      */
     public function index()
     {
-        // TODO: Get all users from database
-        return view('admin.users.index');
+        $users = User::all();
+        return view('admin.users.index', compact('users'));
+    }
+
+    /**
+     * Show the form for creating a new user
+     */
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    /**
+     * Store a newly created user
+     */
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'email',
+                    Rule::unique('users')
+                ],
+                'password' => 'required|string|min:8',
+                'role' => 'required|in:admin,employee,client'
+            ]);
+
+            $validated['password'] = Hash::make($validated['password']);
+
+            User::create($validated);
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'User created successfully');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) { // Integrity constraint violation
+                return back()
+                    ->withInput()
+                    ->withErrors(['email' => 'This email address is already in use.']);
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -21,8 +65,8 @@ class UserController extends Controller
      */
     public function edit($userId)
     {
-        // TODO: Get user data from database
-        return view('admin.users.edit');
+        $user = User::findOrFail($userId);
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -30,9 +74,31 @@ class UserController extends Controller
      */
     public function update(Request $request, $userId)
     {
-        // TODO: Validate and update user data
-        return redirect()->route('admin.users.index')
-            ->with('success', 'Naudotojo informacija sėkmingai atnaujinta');
+        try {
+            $user = User::findOrFail($userId);
+            
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'email',
+                    Rule::unique('users')->ignore($userId)
+                ],
+                'role' => 'required|in:admin,employee,client'
+            ]);
+
+            $user->update($validated);
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'User information updated successfully');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) { // Integrity constraint violation
+                return back()
+                    ->withInput()
+                    ->withErrors(['email' => 'This email address is already in use.']);
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -40,7 +106,7 @@ class UserController extends Controller
      */
     public function show($userId)
     {
-        // TODO: Get user details from database
-        return view('admin.users.show');
+        $user = User::findOrFail($userId);
+        return view('admin.users.show', compact('user'));
     }
 }

@@ -7,18 +7,15 @@ use Illuminate\Http\Request;
 
 class ConferenceController extends Controller
 {
-    /**
-     * Display a list of all conferences
-     */
+    
     public function index()
     {
-        // TODO: Get all conferences from database
         return view('admin.conferences.index');
     }
 
-    /**
-     * Show the form for creating a new conference
-     */
+   
+     //Show the form for creating a new conference
+     
     public function create()
     {
         return view('admin.conferences.create');

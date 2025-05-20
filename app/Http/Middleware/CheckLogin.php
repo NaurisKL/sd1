@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckLogin
@@ -16,7 +16,7 @@ class CheckLogin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Session::has('isLoggedIn')) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
 

@@ -5,7 +5,12 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('users.title') }}</div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Users Management</span>
+                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                        Create New User
+                    </a>
+                </div>
 
                 <div class="card-body">
                     @if (session('success'))
@@ -18,23 +23,21 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>{{ __('users.first_name') }}</th>
-                                    <th>{{ __('users.last_name') }}</th>
-                                    <th>{{ __('users.email') }}</th>
-                                    <th>{{ __('users.role') }}</th>
-                                    <th>{{ __('users.actions.title') }}</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($users as $user)
                                 <tr>
-                                    <td>{{ $user->first_name }}</td>
-                                    <td>{{ $user->last_name }}</td>
+                                    <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
-                                    <td>{{ __('users.roles.' . $user->role) }}</td>
+                                    <td>{{ ucfirst($user->role) }}</td>
                                     <td>
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary btn-sm">
-                                            {{ __('users.actions.edit') }}
+                                            Edit
                                         </a>
                                     </td>
                                 </tr>
