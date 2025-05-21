@@ -19,6 +19,12 @@
                         </div>
                     @endif
 
+                    @if (session('error'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -39,6 +45,16 @@
                                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary btn-sm">
                                             Edit
                                         </a>
+                                        <form action="{{ route('admin.users.destroy', $user) }}" 
+                                              method="POST" 
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @endforeach

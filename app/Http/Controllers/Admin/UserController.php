@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -43,8 +42,6 @@ class UserController extends Controller
                 'password' => 'required|string|min:8',
                 'role' => 'required|in:admin,employee,client'
             ]);
-
-            $validated['password'] = Hash::make($validated['password']);
 
             User::create($validated);
 
@@ -108,5 +105,27 @@ class UserController extends Controller
     {
         $user = User::findOrFail($userId);
         return view('admin.users.show', compact('user'));
+    }
+
+    /**
+     * Delete a user
+     */
+    public function destroy($userId)
+    {
+        $user = User::findOrFail($userId);
+        
+        // Prevent deleting the last admin
+        if ($user->role === 'admin') {
+            $adminCount = User::where('role', 'admin')->count();
+            if ($adminCount <= 1) {
+                return redirect()->route('admin.users.index')
+                    ->with('error', 'Cannot delete the last admin user.');
+            }
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User deleted successfully');
     }
 }

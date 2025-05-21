@@ -5,23 +5,30 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Login</div>
+                <div class="card-header">Register</div>
 
                 <div class="card-body">
-                    @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{ route('register') }}">
                         @csrf
 
                         <div class="form-group row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">Email</label>
+                            <label for="name" class="col-md-4 col-form-label text-md-right">Name</label>
+                            <div class="col-md-6">
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" 
+                                    name="name" value="{{ old('name') }}" required autofocus>
+                                @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-3">
+                            <label for="email" class="col-md-4 col-form-label text-md-right">Email Address</label>
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" 
-                                    name="email" value="{{ old('email') }}" required autofocus>
+                                    name="email" value="{{ old('email') }}" required>
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -44,12 +51,12 @@
                         </div>
 
                         <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
+                            <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    Login
+                                    Register
                                 </button>
-                                <a href="{{ route('register') }}" class="btn btn-link">
-                                    Don't have an account? Register
+                                <a href="{{ route('login') }}" class="btn btn-link">
+                                    Already have an account? Login
                                 </a>
                             </div>
                         </div>

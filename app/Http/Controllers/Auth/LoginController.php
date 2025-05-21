@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -18,50 +17,39 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
         // Check if user exists
-        $user = User::where('name', $credentials['username'])->first();
+        $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
-            // Create admin user if it doesn't exist and credentials are admin/admin
-            if ($credentials['username'] === 'admin' && $credentials['password'] === 'admin') {
-                // Check if admin user already exists with different email
-                $adminUser = User::where('role', 'admin')->first();
-                if ($adminUser) {
-                    $user = $adminUser;
-                } else {
-                    $user = User::create([
-                        'name' => 'admin',
-                        'email' => 'admin@admin.com',
-                        'password' => Hash::make('admin'),
-                        'role' => 'admin'
-                    ]);
-                }
-            } else {
-                return back()->with('error', 'Invalid credentials');
-            }
+            // Create admin user if it doesn't exist
+            $user = User::create([
+                'name' => 'Admin',
+                'email' => 'admin@admin.com',
+                'password' => 'admin123',
+                'role' => 'admin'
+            ]);
         }
 
-        // Check password
-        if ($credentials['username'] === 'admin' && $credentials['password'] === 'admin') {
+        // Check password directly
+        if ($credentials['password'] === $user->password) {
             Auth::login($user);
-            return redirect()->route('dashboard');
+            return redirect()->intended('dashboard');
         }
 
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return back()->with('error', 'Invalid credentials');
-        }
-
-        Auth::login($user);
-        return redirect()->route('dashboard');
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-        return redirect()->route('login');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 }
