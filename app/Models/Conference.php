@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Conference extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'description',
+        'date',
+        'location',
+    ];
+
+    protected $casts = [
+        'date' => 'datetime',
+    ];
 }

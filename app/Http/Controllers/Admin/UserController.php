@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
@@ -14,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::latest()->paginate(10);
         return view('admin.users.index', compact('users'));
     }
 
@@ -31,71 +32,61 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => [
-                    'required',
-                    'email',
-                    Rule::unique('users')
-                ],
-                'password' => 'required|string|min:8',
-                'role' => 'required|in:admin,employee,client'
-            ]);
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', Rules\Password::defaults()],
+            'role' => ['required', 'string', 'in:admin,client,employee'],
+        ]);
 
-            User::create($validated);
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+            'role' => $request->role,
+        ]);
 
-            return redirect()->route('admin.users.index')
-                ->with('success', 'User created successfully');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) { // Integrity constraint violation
-                return back()
-                    ->withInput()
-                    ->withErrors(['email' => 'This email address is already in use.']);
-            }
-            throw $e;
-        }
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User created successfully.');
     }
 
     /**
      * Show the form for editing user
      */
-    public function edit($userId)
+    public function edit(User $user)
     {
-        $user = User::findOrFail($userId);
         return view('admin.users.edit', compact('user'));
     }
 
     /**
      * Update user information
      */
-    public function update(Request $request, $userId)
+    public function update(Request $request, User $user)
     {
-        try {
-            $user = User::findOrFail($userId);
-            
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => [
-                    'required',
-                    'email',
-                    Rule::unique('users')->ignore($userId)
-                ],
-                'role' => 'required|in:admin,employee,client'
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'role' => ['required', 'string', 'in:admin,client,employee'],
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+        ]);
+
+        if ($request->filled('password')) {
+            $request->validate([
+                'password' => [Rules\Password::defaults()],
             ]);
 
-            $user->update($validated);
-
-            return redirect()->route('admin.users.index')
-                ->with('success', 'User information updated successfully');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) { // Integrity constraint violation
-                return back()
-                    ->withInput()
-                    ->withErrors(['email' => 'This email address is already in use.']);
-            }
-            throw $e;
+            $user->update([
+                'password' => $request->password,
+            ]);
         }
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User updated successfully.');
     }
 
     /**
@@ -110,22 +101,11 @@ class UserController extends Controller
     /**
      * Delete a user
      */
-    public function destroy($userId)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($userId);
-        
-        // Prevent deleting the last admin
-        if ($user->role === 'admin') {
-            $adminCount = User::where('role', 'admin')->count();
-            if ($adminCount <= 1) {
-                return redirect()->route('admin.users.index')
-                    ->with('error', 'Cannot delete the last admin user.');
-            }
-        }
-
         $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User deleted successfully');
+            ->with('success', 'User deleted successfully.');
     }
 }

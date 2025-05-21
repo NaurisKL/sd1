@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Client\ConferenceController as ClientConferenceController;
+use App\Http\Controllers\Employee\ConferenceController as EmployeeConferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,42 +37,46 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-});
+    // Client Routes
+    Route::middleware(['role:client'])->group(function () {
+        Route::get('/client', function () {
+            return view('client');
+        })->name('client');
+        
+        Route::get('/client/conferences', [ClientConferenceController::class, 'index'])->name('client.conferences.index');
+        Route::get('/client/conferences/{conference}', [ClientConferenceController::class, 'show'])->name('client.conferences.show');
+    });
 
-Route::middleware(['check.login'])->group(function () {
-    Route::get('/client', function () {
-        return view('client');
-    })->name('client');
+    // Employee Routes
+    Route::middleware(['role:employee'])->group(function () {
+        Route::get('/employee', function () {
+            return view('employee');
+        })->name('employee');
+        
+        Route::get('/employee/conferences', [EmployeeConferenceController::class, 'index'])->name('employee.conferences.index');
+        Route::get('/employee/conferences/{conference}', [EmployeeConferenceController::class, 'show'])->name('employee.conferences.show');
+    });
 
-    Route::get('/employee', function () {
-        return view('employee');
-    })->name('employee');
+    // Admin Routes
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/admin', function () {
+            return view('admin');
+        })->name('admin');
 
-    Route::get('/admin', function () {
-        return view('admin');
-    })->name('admin');
+        // User Management Routes
+        Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
+        Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
+        Route::get('/admin/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
-   
-    Route::prefix('admin')->group(function () {
-       
-        Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
-        Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create');
-        Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store');
-        Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.users.edit');
-        Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('admin.users.destroy');
-    
-        Route::get('/conferences', [App\Http\Controllers\Admin\ConferenceController::class, 'index'])->name('admin.conferences.index');
-        Route::get('/conferences/create', [App\Http\Controllers\Admin\ConferenceController::class, 'create'])->name('admin.conferences.create');
-        Route::post('/conferences', [App\Http\Controllers\Admin\ConferenceController::class, 'store'])->name('admin.conferences.store');
-        Route::get('/conferences/{conference}/edit', [App\Http\Controllers\Admin\ConferenceController::class, 'edit'])->name('admin.conferences.edit');
-        Route::put('/conferences/{conference}', [App\Http\Controllers\Admin\ConferenceController::class, 'update'])->name('admin.conferences.update');
-        Route::delete('/conferences/{conference}', [App\Http\Controllers\Admin\ConferenceController::class, 'destroy'])->name('admin.conferences.destroy');
+        // Conference Management Routes
+        Route::get('/admin/conferences', [App\Http\Controllers\Admin\ConferenceController::class, 'index'])->name('admin.conferences.index');
+        Route::get('/admin/conferences/create', [App\Http\Controllers\Admin\ConferenceController::class, 'create'])->name('admin.conferences.create');
+        Route::post('/admin/conferences', [App\Http\Controllers\Admin\ConferenceController::class, 'store'])->name('admin.conferences.store');
+        Route::get('/admin/conferences/{conference}/edit', [App\Http\Controllers\Admin\ConferenceController::class, 'edit'])->name('admin.conferences.edit');
+        Route::put('/admin/conferences/{conference}', [App\Http\Controllers\Admin\ConferenceController::class, 'update'])->name('admin.conferences.update');
+        Route::delete('/admin/conferences/{conference}', [App\Http\Controllers\Admin\ConferenceController::class, 'destroy'])->name('admin.conferences.destroy');
     });
 });

@@ -3,14 +3,32 @@
 @section('title', 'Client Dashboard')
 
 @section('content')
-    <div class="dashboard-container">
-        <h2 class="welcome-message">Client Dashboard</h2>
-        
-        <div class="content-section">
-            <h3>Available Conferences</h3>
-            <div class="conference-list">
-                <!-- Conference list will go here -->
-                <p class="text-muted">No conferences available at the moment.</p>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">{{ __('Client Dashboard') }}</div>
+
+                    <div class="card-body">
+                        @if (session('status'))
+                            <div class="alert alert-success" role="alert">
+                                {{ session('status') }}
+                            </div>
+                        @endif
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Conferences</h5>
+                                        <p class="card-text">View all available conferences and their details.</p>
+                                        <a href="{{ route('client.conferences.index') }}" class="btn btn-primary">View Conferences</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Conference;
 use Illuminate\Http\Request;
 
 class ConferenceController extends Controller
 {
-    
     public function index()
     {
-        return view('admin.conferences.index');
+        $conferences = Conference::latest()->paginate(10);
+        return view('admin.conferences.index', compact('conferences'));
     }
 
    
@@ -26,37 +27,53 @@ class ConferenceController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Validate and store conference data
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'date' => 'required|date',
+            'location' => 'required|string|max:255',
+        ]);
+
+        Conference::create($request->all());
+
         return redirect()->route('admin.conferences.index')
-            ->with('success', 'Konferencija sėkmingai sukurta');
+            ->with('success', 'Conference created successfully.');
     }
 
     /**
      * Show the form for editing conference
      */
-    public function edit($conferenceId)
+    public function edit(Conference $conference)
     {
-        // TODO: Get conference data from database
-        return view('admin.conferences.edit');
+        return view('admin.conferences.edit', compact('conference'));
     }
 
     /**
      * Update conference information
      */
-    public function update(Request $request, $conferenceId)
+    public function update(Request $request, Conference $conference)
     {
-        // TODO: Validate and update conference data
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'date' => 'required|date',
+            'location' => 'required|string|max:255',
+        ]);
+
+        $conference->update($request->all());
+
         return redirect()->route('admin.conferences.index')
-            ->with('success', 'Konferencijos informacija sėkmingai atnaujinta');
+            ->with('success', 'Conference updated successfully.');
     }
 
     /**
      * Remove the specified conference
      */
-    public function destroy($conferenceId)
+    public function destroy(Conference $conference)
     {
-        // TODO: Delete conference from database
+        $conference->delete();
+
         return redirect()->route('admin.conferences.index')
-            ->with('success', 'Konferencija sėkmingai pašalinta');
+            ->with('success', 'Conference deleted successfully.');
     }
 }

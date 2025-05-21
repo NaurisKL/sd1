@@ -6,10 +6,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>{{ __('conferences.title') }}</span>
-                    <a href="{{ route('admin.conferences.create') }}" class="btn btn-primary">
-                        {{ __('conferences.actions.create') }}
-                    </a>
+                    <h5 class="mb-0">Conferences</h5>
+                    <a href="{{ route('admin.conferences.create') }}" class="btn btn-primary">Add New Conference</a>
                 </div>
 
                 <div class="card-body">
@@ -23,48 +21,33 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>{{ __('conferences.title') }}</th>
-                                    <th>{{ __('conferences.date') }}</th>
-                                    <th>{{ __('conferences.location') }}</th>
-                                    <th>{{ __('conferences.status.title') }}</th>
-                                    <th>{{ __('conferences.actions.title') }}</th>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($conferences as $conference)
-                                <tr>
-                                    <td>{{ $conference->title }}</td>
-                                    <td>{{ $conference->date->format('Y-m-d H:i') }}</td>
-                                    <td>{{ $conference->location }}</td>
-                                    <td>
-                                        @if($conference->date->isPast())
-                                            {{ __('conferences.status.past') }}
-                                        @else
-                                            {{ __('conferences.status.upcoming') }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.conferences.edit', $conference) }}" class="btn btn-primary btn-sm">
-                                            {{ __('conferences.actions.edit') }}
-                                        </a>
-                                        @if(!$conference->date->isPast())
-                                            <form action="{{ route('admin.conferences.destroy', $conference) }}" 
-                                                  method="POST" 
-                                                  class="d-inline"
-                                                  data-confirm="{{ __('conferences.actions.confirm_delete') }}">
+                                    <tr>
+                                        <td>{{ $conference->title }}</td>
+                                        <td>{{ $conference->date->format('Y-m-d H:i') }}</td>
+                                        <td>{{ $conference->location }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.conferences.edit', $conference) }}" class="btn btn-sm btn-primary">Edit</a>
+                                            <form action="{{ route('admin.conferences.destroy', $conference) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    {{ __('conferences.actions.delete') }}
-                                                </button>
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this conference?')">Delete</button>
                                             </form>
-                                        @endif
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+
+                    {{ $conferences->links() }}
                 </div>
             </div>
         </div>
