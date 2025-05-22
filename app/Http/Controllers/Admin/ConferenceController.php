@@ -32,6 +32,7 @@ class ConferenceController extends Controller
             'description' => 'required|string',
             'date' => 'required|date',
             'location' => 'required|string|max:255',
+            'capacity' => 'nullable|integer|min:1',
         ]);
 
         Conference::create($request->all());
@@ -58,6 +59,7 @@ class ConferenceController extends Controller
             'description' => 'required|string',
             'date' => 'required|date',
             'location' => 'required|string|max:255',
+            'capacity' => 'nullable|integer|min:1',
         ]);
 
         $conference->update($request->all());
