@@ -79,4 +79,19 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/admin/conferences/{conference}', [App\Http\Controllers\Admin\ConferenceController::class, 'update'])->name('admin.conferences.update');
         Route::delete('/admin/conferences/{conference}', [App\Http\Controllers\Admin\ConferenceController::class, 'destroy'])->name('admin.conferences.destroy');
     });
+
+    // Client Conference Routes
+    Route::middleware(['auth', 'role:client'])->group(function () {
+        Route::get('/conferences', [App\Http\Controllers\Client\ConferenceController::class, 'index'])->name('client.conferences.index');
+        Route::get('/conferences/{conference}', [App\Http\Controllers\Client\ConferenceController::class, 'show'])->name('client.conferences.show');
+        Route::post('/conferences/{conference}/register', [App\Http\Controllers\Client\ConferenceController::class, 'register'])->name('client.conferences.register');
+        Route::delete('/conferences/{conference}/unregister', [App\Http\Controllers\Client\ConferenceController::class, 'unregister'])->name('client.conferences.unregister');
+    });
+
+    // Employee Conference Routes
+    Route::middleware(['auth', 'role:employee'])->group(function () {
+        Route::get('/employee/conferences', [App\Http\Controllers\Employee\ConferenceController::class, 'index'])->name('employee.conferences.index');
+        Route::get('/employee/conferences/{conference}', [App\Http\Controllers\Employee\ConferenceController::class, 'show'])->name('employee.conferences.show');
+        Route::patch('/employee/conferences/{conference}/registrations/{user}', [App\Http\Controllers\Employee\ConferenceController::class, 'updateRegistration'])->name('employee.conferences.update-registration');
+    });
 });

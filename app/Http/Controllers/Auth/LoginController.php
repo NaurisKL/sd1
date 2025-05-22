@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -21,22 +22,8 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        // Check if user exists
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (!$user) {
-            // Create admin user if it doesn't exist
-            $user = User::create([
-                'name' => 'Admin',
-                'email' => 'admin@admin.com',
-                'password' => 'admin123',
-                'role' => 'admin'
-            ]);
-        }
-
-        // Check password directly
-        if ($credentials['password'] === $user->password) {
-            Auth::login($user);
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
             return redirect()->intended('dashboard');
         }
 
